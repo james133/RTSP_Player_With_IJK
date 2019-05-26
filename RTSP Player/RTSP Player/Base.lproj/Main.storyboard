@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="j3P-qe-VJo">
+    <device id="retina6_1" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Main View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="MainViewController" customModule="RTSP_Player" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="LA0-eQ-Kmy">
+                                <rect key="frame" x="0.0" y="88" width="414" height="774"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="LA0-eQ-Kmy" secondAttribute="bottom" id="ERe-eq-LYk"/>
+                            <constraint firstItem="LA0-eQ-Kmy" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="a6Y-Sb-GiH"/>
+                            <constraint firstItem="LA0-eQ-Kmy" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="jlh-ga-G1T"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="LA0-eQ-Kmy" secondAttribute="trailing" id="uyP-qB-Ys1"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="5tg-0j-E56"/>
+                    <connections>
+                        <outlet property="tableViewMain" destination="LA0-eQ-Kmy" id="eee-pN-n2Z"/>
+                        <segue destination="uUX-Ml-bus" kind="show" identifier="MainToIJKPlayer" id="qy4-1a-mJC"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="883" y="765"/>
+        </scene>
+        <!--Player View Controller-->
+        <scene sceneID="1wv-L2-zFu">
+            <objects>
+                <viewController id="uUX-Ml-bus" customClass="IJKPlayerViewController" customModule="RTSP_Player" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="dtA-db-K1H">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Input RTSP url" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="P0w-Wk-CIG">
+                                <rect key="frame" x="0.0" y="88" width="414" height="30"/>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="uUX-Ml-bus" id="AZJ-ym-mn6"/>
+                                </connections>
+                            </textField>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Jhw-60-09F">
+                                <rect key="frame" x="0.0" y="118" width="414" height="300"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="300" id="py6-n6-P7p"/>
+                                </constraints>
+                            </view>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="94" translatesAutoresizingMaskIntoConstraints="NO" id="Txc-RJ-5vg">
+                                <rect key="frame" x="123" y="433" width="168" height="50"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eh4-QS-Pd2">
+                                        <rect key="frame" x="0.0" y="0.0" width="42" height="50"/>
+                                        <state key="normal" title="Pause"/>
+                                        <connections>
+                                            <action selector="invokeButtonPlay:" destination="uUX-Ml-bus" eventType="touchUpInside" id="Dlt-Z3-hXj"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QTH-fN-GLP">
+                                        <rect key="frame" x="136" y="0.0" width="32" height="50"/>
+                                        <state key="normal" title="Stop"/>
+                                        <connections>
+                                            <action selector="invokeButtonStop:" destination="uUX-Ml-bus" eventType="touchUpInside" id="jLz-Tb-qhU"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="QRg-ec-6Je"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="P0w-Wk-CIG" firstAttribute="leading" secondItem="Dbf-kl-TAO" secondAttribute="leading" id="9A2-gb-gOn"/>
+                            <constraint firstItem="P0w-Wk-CIG" firstAttribute="top" secondItem="Dbf-kl-TAO" secondAttribute="top" id="Chx-QH-0Dj"/>
+                            <constraint firstItem="Jhw-60-09F" firstAttribute="trailing" secondItem="Dbf-kl-TAO" secondAttribute="trailing" id="Nnn-OF-7HI"/>
+                            <constraint firstItem="P0w-Wk-CIG" firstAttribute="trailing" secondItem="Dbf-kl-TAO" secondAttribute="trailing" id="OnW-El-RsA"/>
+                            <constraint firstItem="Txc-RJ-5vg" firstAttribute="centerX" secondItem="dtA-db-K1H" secondAttribute="centerX" id="QyC-Aw-3Cs"/>
+                            <constraint firstItem="Txc-RJ-5vg" firstAttribute="top" secondItem="Jhw-60-09F" secondAttribute="bottom" constant="15" id="dfl-k3-xms"/>
+                            <constraint firstItem="Jhw-60-09F" firstAttribute="top" secondItem="P0w-Wk-CIG" secondAttribute="bottom" id="k0m-RE-Yqp"/>
+                            <constraint firstItem="Jhw-60-09F" firstAttribute="leading" secondItem="Dbf-kl-TAO" secondAttribute="leading" id="qSE-Ab-tfn"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Dbf-kl-TAO"/>
+                    </view>
+                    <connections>
+                        <outlet property="buttonPlayPause" destination="eh4-QS-Pd2" id="CB8-8j-zwb"/>
+                        <outlet property="buttonStop" destination="QTH-fN-GLP" id="100-4m-vqu"/>
+                        <outlet property="textFieldURL" destination="P0w-Wk-CIG" id="pR4-ct-iko"/>
+                        <outlet property="viewPlayer" destination="Jhw-60-09F" id="2By-wl-Ns0"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="jVY-23-lRJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1849.2753623188407" y="366.96428571428572"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="Q2p-dz-SyL">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="j3P-qe-VJo" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="aym-hn-WIu">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="8Jj-Zr-Nlt"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5CD-cx-vtL" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="171.01449275362319" y="765.40178571428567"/>
+        </scene>
+    </scenes>
+</document>
