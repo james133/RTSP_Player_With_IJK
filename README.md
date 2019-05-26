@@ -99,4 +99,4 @@ class IJKPlayerViewController: UIViewController {
         self.player = player        
         self.player.prepareToPlay()
     }
-}```
+}
