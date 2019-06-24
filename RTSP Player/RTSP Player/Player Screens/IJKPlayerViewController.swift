@@ -101,15 +101,53 @@ class IJKPlayerViewController: UIViewController {
         // User-agent
         options.setFormatOptionValue("rtsp-player", forKey: "user-agent")
         
-        options.setOptionIntValue(0, forKey: "packet-buffering", of: kIJKFFOptionCategoryPlayer)
-        options.setOptionValue("nobuffer", forKey: "fflags", of: kIJKFFOptionCategoryFormat)
-        options.setOptionIntValue(512 * 1024, forKey: "max-buffer-size", of: kIJKFFOptionCategoryFormat)
-        options.setOptionIntValue(5, forKey: "min-frames", of: kIJKFFOptionCategoryPlayer)
-        options.setOptionIntValue(4096, forKey: "probsize", of: kIJKFFOptionCategoryFormat)
-        options.setOptionIntValue(2000000, forKey: "analyzeduration", of: kIJKFFOptionCategoryFormat)
+        options.setOptionIntValue(0,            forKey: "packet-buffering", of: kIJKFFOptionCategoryPlayer)
+        options.setOptionIntValue(5,            forKey: "min-frames",       of: kIJKFFOptionCategoryPlayer)
+        options.setOptionIntValue(25,           forKey: "max-fps",          of: kIJKFFOptionCategoryPlayer)
         
-        options.setOptionIntValue(32, forKey: "probesize", of: kIJKFFOptionCategoryFormat)
-        options.setOptionValue("ext", forKey: "sync", of: kIJKFFOptionCategoryFormat)
+        options.setOptionIntValue(512 * 1024,   forKey: "max-buffer-size",  of: kIJKFFOptionCategoryFormat)
+        options.setOptionIntValue(4096,         forKey: "probsize",         of: kIJKFFOptionCategoryFormat)
+        options.setOptionIntValue(2000000,      forKey: "analyzeduration",  of: kIJKFFOptionCategoryFormat)
+        options.setOptionIntValue(32,           forKey: "probesize",        of: kIJKFFOptionCategoryFormat)
+        
+        options.setOptionValue("ext",           forKey: "sync",             of: kIJKFFOptionCategoryFormat)
+        options.setOptionValue("nobuffer",      forKey: "fflags",           of: kIJKFFOptionCategoryFormat)
+//
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "opensles", 0);
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "framedrop", 1);
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 1);
+//
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "http-detect-range-support", 0);
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "fflags", "nobuffer");
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "flush_packets", 1);
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "max_delay", 0);
+//
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "skip_loop_filter", 48);
+//
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "packet-buffering", 0);
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "max-buffer-size", 4 * 1024);
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "min-frames", 50);
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "probsize", "1024");
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "analyzeduration", "100");
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "dns_cache_clear", 1);
+//        //mute
+//        //mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "an", 1);
+//        / / Reconnect mode, if the midway server disconnected, let it reconnect
+//        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "reconnect", 1);
+        
+//        [options setPlayerOptionIntValue:30  forKey:@"max-fps"];
+//        [options setPlayerOptionIntValue:30 forKey:@"r"];
+//        [options setPlayerOptionIntValue:1  forKey:@"framedrop"];
+//        [options setPlayerOptionIntValue:0  forKey:@"start-on-prepared"];
+//        [options setPlayerOptionIntValue:0  forKey:@"http-detect-range-support"];
+//        [options setPlayerOptionIntValue:48  forKey:@"skip_loop_filter"];
+//        [options setPlayerOptionIntValue:0  forKey:@"packet-buffering"];
+//        [options setPlayerOptionIntValue:2000000 forKey:@"analyzeduration"];
+//        [options setPlayerOptionIntValue:25  forKey:@"min-frames"];
+//        [options setPlayerOptionIntValue:1  forKey:@"start-on-prepared"];
+//        [options setCodecOptionIntValue:8 forKey:@"skip_frame"];
+//        [options setFormatOptionValue:@"nobuffer" forKey:@"fflags"];
+//        [options setFormatOptionValue:@"8192" forKey:@"probsize"];
     }
     
     private func playVideo(with url: String) {
@@ -158,8 +196,8 @@ extension IJKPlayerViewController: UITextFieldDelegate {
         // rtsp://170.93.143.139/rtplive/470011e600ef003a004ee33696235daa
         //rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
         if textField.text?.count == 0 {
-//            textField.text = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
-            textField.text = "rtsp://admin:1234qwer@192.168.1.7:554/onvif1"
+            textField.text = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
+//            textField.text = "rtsp://admin:1234qwer@192.168.1.7:554/onvif1"
         }
         let urlString = textField.text
         playVideo(with: urlString ?? "rtsp://admin:1234qwer@192.168.0.174:554/onvif1")
