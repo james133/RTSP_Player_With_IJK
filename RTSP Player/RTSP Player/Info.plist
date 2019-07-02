@@ -20,6 +20,10 @@
 	<string>2</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Need permission to save livestream snapshots</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Vừng ơi bành ra</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
