@@ -8,6 +8,7 @@
 
 import UIKit
 import IJKMediaFramework
+import Photos
 
 class IJKPlayerViewController: UIViewController {
 
@@ -18,6 +19,7 @@ class IJKPlayerViewController: UIViewController {
     
     private var player: IJKFFMoviePlayerController!
     private weak var timer: Timer?
+    private var isStopRecording = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -112,7 +114,8 @@ class IJKPlayerViewController: UIViewController {
         
         options.setOptionValue("ext",           forKey: "sync",             of: kIJKFFOptionCategoryFormat)
         options.setOptionValue("nobuffer",      forKey: "fflags",           of: kIJKFFOptionCategoryFormat)
-//
+        options.setOptionIntValue(1, forKey: "reconnect", of: kIJKFFOptionCategoryPlayer)
+//mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "reconnect", 1);
 //        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "opensles", 0);
 //        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "framedrop", 1);
 //        mediaPlayer.setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 1);
@@ -180,12 +183,37 @@ class IJKPlayerViewController: UIViewController {
     }
     
     @IBAction func invokeButtonTakeImage(_ sender: UIButton) {
-        if let screenShotImage = player.thumbnailImageAtCurrentTime() {            
-            print(screenShotImage)
-            UIImageWriteToSavedPhotosAlbum(screenShotImage, self, nil, nil)
-        } else {
-            print("Save image failed")
+        let urlPath = FileManager.default.temporaryDirectory
+            .appendingPathComponent("fileName.mov")
+        player.thumbnailImageAtCurrentTime()
+
+        player.rtsp2mov("rtsp://170.93.143.139/rtplive/470011e600ef003a004ee33696235daa", storageFilePath: urlPath.absoluteString, isStop: isStopRecording)
+        if isStopRecording {
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: urlPath)
+            }) { saved, error in
+                if saved {
+                    let alertController = UIAlertController(title: "Your video was successfully saved", message: nil, preferredStyle: .alert)
+                    let defaultAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                    alertController.addAction(defaultAction)
+                    self.present(alertController, animated: true, completion: nil)
+                } else {
+                    print(error ?? "Unknow error")
+                    let alertController = UIAlertController(title: "Your video was successfully FAILED", message: nil, preferredStyle: .alert)
+                    let defaultAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+                    alertController.addAction(defaultAction)
+                    self.present(alertController, animated: true, completion: nil)
+                }
+            }
         }
+        isStopRecording = !isStopRecording
+//        if let screenShotImage = player.thumbnailImageAtCurrentTime() {
+//            print(screenShotImage)
+//            UIImageWriteToSavedPhotosAlbum(screenShotImage, self, nil, nil)
+//        } else {
+//            print("Save image failed")
+//        }
+        
     }
     
     
@@ -196,7 +224,7 @@ extension IJKPlayerViewController: UITextFieldDelegate {
         // rtsp://170.93.143.139/rtplive/470011e600ef003a004ee33696235daa
         //rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
         if textField.text?.count == 0 {
-            textField.text = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
+            textField.text = "rtsp://170.93.143.139/rtplive/470011e600ef003a004ee33696235daa"
 //            textField.text = "rtsp://admin:1234qwer@192.168.1.7:554/onvif1"
         }
         let urlString = textField.text
