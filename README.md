@@ -5,10 +5,10 @@ RTSP player on iOS using Swift with IJKPlayer (https://github.com/bilibili/ijkpl
 
 ## Table of Contents
 
-* [Chuẩn bị môi trường](#Chuẩn_bị_môi_trường)
-* [Build lib IJKPlayer](#Build_lib_IJKPlayer)
-* [Tích hợp IJKPlayer vào project](#Tích_hợp_IJKPlayer_vào_project)
-* Sample
+* [Chuẩn bị môi trường](#chuẩn_bị_môi_trường)
+* [Build lib IJKPlayer](#build_lib_IJKPlayer)
+* [Tích hợp IJKPlayer vào project](#tích_hợp_IJKPlayer_vào_project)
+* [Sample](#sample)
 
 ### Chuẩn bị môi trường
 * Cài đặt Homebrew
