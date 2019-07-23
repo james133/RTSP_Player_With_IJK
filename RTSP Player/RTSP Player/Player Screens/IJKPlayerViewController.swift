@@ -12,6 +12,7 @@ import Photos
 
 class IJKPlayerViewController: UIViewController {
 
+    @IBOutlet weak var playbackSlider: UISlider!
     @IBOutlet weak var textFieldURL: UITextField!
     @IBOutlet weak var viewPlayer: UIView!
     @IBOutlet weak var buttonPlayPause: UIButton!
@@ -19,7 +20,10 @@ class IJKPlayerViewController: UIViewController {
     
     private var player: IJKFFMoviePlayerController!
     private weak var timer: Timer?
+    private weak var currentPlaybackTimer: Timer?
     private var isStopRecording = false
+    
+    private var ageObservation: NSKeyValueObservation?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,11 +31,9 @@ class IJKPlayerViewController: UIViewController {
         // Do any additional setup after loading the view.
         textFieldURL.delegate = self
         
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleReplayStream),
-            name: NSNotification.Name.IJKMPMoviePlayerLoadStateDidChange,
-            object: nil)
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+        
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -45,27 +47,15 @@ class IJKPlayerViewController: UIViewController {
         
         timer?.invalidate()
         timer = nil
-
-        player.stop()
-        player.shutdown()
-        player = nil
-    }
-    
-    deinit {
-//        timer?.invalidate()
-//        timer = nil
-//
-//        player.stop()
-//        player.shutdown()
-//        player = nil
-    }
-    
-    @objc private func handleReplayStream() {
-        if !player.isPlaying() {
-            self.player.play()
+        currentPlaybackTimer?.invalidate()
+        currentPlaybackTimer = nil
+        if let player = player {
+            player.stop()
+            player.shutdown()
         }
+        removePlayerStateObserver()
     }
-    
+
     private func setupPlayer(with url: URL) {
         if self.player != nil {
             self.player.view.removeFromSuperview()
@@ -86,11 +76,14 @@ class IJKPlayerViewController: UIViewController {
         player.scalingMode = IJKMPMovieScalingMode.aspectFit
         player.shouldAutoplay = true
         player.shouldShowHudView = true
+        IJKFFMoviePlayerController.setLogLevel(k_IJK_LOG_DEBUG)
         
         viewPlayer.autoresizesSubviews = true
         viewPlayer.addSubview(player.view)
         
         self.player = player
+        
+        addPlayerStateObserver(player: player)
     }
     
     private func settingOptionForPlayer(_ options: IJKFFOptions) {
@@ -162,8 +155,6 @@ class IJKPlayerViewController: UIViewController {
         showLoadingProgress(for: viewPlayer)
         setupPlayer(with: url)
         player.prepareToPlay()
-        
-        timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(checkPlayerState), userInfo: nil, repeats: true)
     }
     
     @IBAction func invokeButtonPlay(_ sender: UIButton) {
@@ -180,18 +171,22 @@ class IJKPlayerViewController: UIViewController {
         player.stop()
         player.shutdown()
         enableButtons(false)
+        removePlayerStateObserver()
     }
     
     @IBAction func invokeButtonTakeImage(_ sender: UIButton) {
-        let urlPath = FileManager.default.temporaryDirectory
-            .appendingPathComponent("fileName.mov")
-        player.thumbnailImageAtCurrentTime()
+        let urlPath = getDocumentsDirectory()
+        print(urlPath)
+        if !isStopRecording {
+            player.startRecord(withFileName: urlPath.absoluteString)
+        } else {
+            player.stopRecord()
+        }
 
-        player.rtsp2mov("rtsp://170.93.143.139/rtplive/470011e600ef003a004ee33696235daa", storageFilePath: urlPath.absoluteString, isStop: isStopRecording)
         if isStopRecording {
             PHPhotoLibrary.shared().performChanges({
                 PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: urlPath)
-            }) { saved, error in
+            }) { [unowned self] saved, error in
                 if saved {
                     let alertController = UIAlertController(title: "Your video was successfully saved", message: nil, preferredStyle: .alert)
                     let defaultAction = UIAlertAction(title: "OK", style: .default, handler: nil)
@@ -199,36 +194,51 @@ class IJKPlayerViewController: UIViewController {
                     self.present(alertController, animated: true, completion: nil)
                 } else {
                     print(error ?? "Unknow error")
-                    let alertController = UIAlertController(title: "Your video was successfully FAILED", message: nil, preferredStyle: .alert)
+                    let alertController = UIAlertController(title: "Your video was successfully FAILED", message: error?.localizedDescription, preferredStyle: .alert)
                     let defaultAction = UIAlertAction(title: "OK", style: .default, handler: nil)
                     alertController.addAction(defaultAction)
-                    self.present(alertController, animated: true, completion: nil)
+                    DispatchQueue.main.async {
+                        self.present(alertController, animated: true, completion: nil)
+                    }
                 }
             }
         }
         isStopRecording = !isStopRecording
-//        if let screenShotImage = player.thumbnailImageAtCurrentTime() {
-//            print(screenShotImage)
-//            UIImageWriteToSavedPhotosAlbum(screenShotImage, self, nil, nil)
-//        } else {
-//            print("Save image failed")
-//        }
-        
     }
     
-    
+    func getDocumentsDirectory() -> URL {
+        let path = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as String
+        let url = NSURL(fileURLWithPath: path)
+        if let pathComponent = url.appendingPathComponent("rtsp.mov") {
+            let filePath = pathComponent.path
+            let fileManager = FileManager.default
+            if fileManager.fileExists(atPath: filePath) {
+                print("FILE AVAILABLE")
+                let attr: [FileAttributeKey : Any]? = try? FileManager.default.attributesOfItem(atPath: filePath) as [FileAttributeKey : Any]
+                if let _attr = attr {
+                    print(_attr)
+                }
+            } else {
+                print("FILE NOT AVAILABLE")
+            }
+        } else {
+            print("FILE PATH NOT AVAILABLE")
+        }
+        
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentsDirectory = paths[0]
+        return documentsDirectory.appendingPathComponent("rtsp.mov")
+    }
 }
 
 extension IJKPlayerViewController: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
-        // rtsp://170.93.143.139/rtplive/470011e600ef003a004ee33696235daa
-        //rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
         if textField.text?.count == 0 {
+//            textField.text = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov"
             textField.text = "rtsp://170.93.143.139/rtplive/470011e600ef003a004ee33696235daa"
-//            textField.text = "rtsp://admin:1234qwer@192.168.1.7:554/onvif1"
         }
-        let urlString = textField.text
-        playVideo(with: urlString ?? "rtsp://admin:1234qwer@192.168.0.174:554/onvif1")
+        
+        playVideo(with: textField.text ?? "rtsp://admin:1234qwer@192.168.0.174:554/onvif1")
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -237,19 +247,7 @@ extension IJKPlayerViewController: UITextFieldDelegate {
     }
 }
 
-private extension IJKPlayerViewController {
-    @objc private func checkPlayerState() {
-        if player.isPlaying() == true {
-            hideLoadingProgress()
-            timer?.invalidate()
-            enableButtons(true)
-        }
-        
-        print("Checking Player State")
-    }
-}
-
-// MARK: UI ralated
+// MARK: UI related
 private extension IJKPlayerViewController {
     private func showLoadingProgress(for view: UIView) {
         ProgressView.show(view: view)
@@ -265,7 +263,118 @@ private extension IJKPlayerViewController {
     }
 }
 
+// Handle playback current time and seek
+private extension IJKPlayerViewController {
+    private func createTrackingPlaybackTimerForPlayer(_ player: IJKFFMoviePlayerController) {
+        currentPlaybackTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(currentSeekPosition), userInfo: nil, repeats: true)
+    }
+    
+    @objc private func currentSeekPosition() {
+        playbackSlider.maximumValue = Float(player.duration)
+        playbackSlider.minimumValue = 0.0
+        playbackSlider.value = Float(player.currentPlaybackTime)
+    }
+    
+    @IBAction func changePlaybackTime(_ sender: UISlider, _ event: UIEvent) {
+        currentPlaybackTimer?.invalidate()
+        
+        if let touchEvent = event.allTouches?.first {
+            switch touchEvent.phase {
+            case .ended:
+                player.currentPlaybackTime = TimeInterval(sender.value)
+            default:
+                break
+            }
+        }
+    }
+}
+
 // MARK: Notification register and remover
 private extension IJKPlayerViewController {
+    private func addPlayerStateObserver(player: IJKFFMoviePlayerController) {
+        NotificationCenter.default.addObserver(self, selector: #selector(loadStateDidChanged(_:)), name:NSNotification.Name.IJKMPMoviePlayerLoadStateDidChange, object: player)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(prepareToPlayDidChanged(_:)), name: NSNotification.Name.IJKMPMediaPlaybackIsPreparedToPlayDidChange, object: player)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(playbackStateDidChange(_:)), name: NSNotification.Name.IJKMPMoviePlayerPlaybackStateDidChange, object: player)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(playerDidSeekComplete(_:)), name: NSNotification.Name.IJKMPMoviePlayerDidSeekComplete, object: player)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(playbackDidFinished(_:)), name: Notification.Name.IJKMPMoviePlayerPlaybackDidFinish, object: player)
+    }
     
+    private func removePlayerStateObserver() {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    // Loading state
+    @objc private func loadStateDidChanged(_ notification: NSNotification) {
+        print(notification)
+        print(player.loadState)
+
+        switch player.loadState.rawValue {
+        case IJKMPMovieLoadState.playthroughOK.rawValue | IJKMPMovieLoadState.playable.rawValue:
+            print("PLAY THROUGH OK")
+            print(player.currentPlaybackTime)
+            print(player.playableDuration)
+            print(player.duration)
+            createTrackingPlaybackTimerForPlayer(player)
+            enableButtons(true)
+            hideLoadingProgress()
+        case IJKMPMovieLoadState.stalled.rawValue:
+            print("PLAY STOPPED - RETRY")
+            player.play()
+        default:
+            print("OTHER STATE")
+        }
+    }
+    
+    @objc private func prepareToPlayDidChanged(_ notification: NSNotification) {
+        print(notification)
+        print(player.loadState)
+    }
+    
+    @objc private func playbackStateDidChange(_ notification: NSNotification) {
+        switch player.playbackState {
+        case .stopped:
+            print(".stopped")
+        case .playing:
+            print(".playing")
+        case .paused:
+            print(".pause")
+        case .interrupted:
+            print(".interrupted")
+        case .seekingForward, .seekingBackward:
+            print(".seeking")
+            currentPlaybackTimer?.invalidate()
+        default:
+            print("IJKMPMoviePlayerPlaybackStateDidChange unknow state = \(player.playbackState)")
+        }
+    }
+    
+    @objc private func playerDidSeekComplete(_ notification: NSNotification) {
+        createTrackingPlaybackTimerForPlayer(player)
+    }
+    
+    @objc private func playbackDidFinished(_ notification: NSNotification) {
+        // If have more than 1 dic in userinfo, it should be error
+        guard let userInfo = notification.userInfo else {
+            // UserInfo not have data => not need to handle
+            return
+        }
+        
+        let reason = userInfo[IJKMPMoviePlayerPlaybackDidFinishReasonUserInfoKey] as? Int ?? -1
+        let error = userInfo["error"] as? Int ?? -1
+        
+        switch reason {
+        case IJKMPMovieFinishReason.playbackError.rawValue:
+            print("playback error \(error)")
+            hideLoadingProgress()
+        case IJKMPMovieFinishReason.playbackEnded.rawValue:
+            print("playback ended")            
+        default:
+            print("unknow error")
+            hideLoadingProgress()
+        }
+    }
 }

@@ -67,7 +67,7 @@
                                 </constraints>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="94" translatesAutoresizingMaskIntoConstraints="NO" id="Txc-RJ-5vg">
-                                <rect key="frame" x="123" y="433" width="168" height="50"/>
+                                <rect key="frame" x="51.5" y="433" width="311" height="50"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eh4-QS-Pd2">
                                         <rect key="frame" x="0.0" y="0.0" width="42" height="50"/>
@@ -83,11 +83,25 @@
                                             <action selector="invokeButtonStop:" destination="uUX-Ml-bus" eventType="touchUpInside" id="jLz-Tb-qhU"/>
                                         </connections>
                                     </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="f2c-mu-8I8" userLabel="Button Record">
+                                        <rect key="frame" x="262" y="0.0" width="49" height="50"/>
+                                        <state key="normal" title="Record"/>
+                                        <connections>
+                                            <action selector="invokeButtonTakeImage:" destination="uUX-Ml-bus" eventType="touchUpInside" id="0Pe-R4-Liv"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="QRg-ec-6Je"/>
                                 </constraints>
                             </stackView>
+                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="oTI-f1-094">
+                                <rect key="frame" x="18" y="478" width="378" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <connections>
+                                    <action selector="changePlaybackTime::" destination="uUX-Ml-bus" eventType="valueChanged" id="Wni-Yt-n8q"/>
+                                </connections>
+                            </slider>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
@@ -105,6 +119,7 @@
                     <connections>
                         <outlet property="buttonPlayPause" destination="eh4-QS-Pd2" id="CB8-8j-zwb"/>
                         <outlet property="buttonStop" destination="QTH-fN-GLP" id="100-4m-vqu"/>
+                        <outlet property="playbackSlider" destination="oTI-f1-094" id="7mO-Vu-Pjm"/>
                         <outlet property="textFieldURL" destination="P0w-Wk-CIG" id="pR4-ct-iko"/>
                         <outlet property="viewPlayer" destination="Jhw-60-09F" id="2By-wl-Ns0"/>
                     </connections>
